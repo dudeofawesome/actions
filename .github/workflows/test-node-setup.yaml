@@ -19,6 +19,8 @@ jobs:
 
       - name: 'Setup node 🛎️'
         uses: './node-setup'
+        with:
+          node-version-file: ''
 
       - name: 'Ensure node_modules exists ✅'
         run: |-
