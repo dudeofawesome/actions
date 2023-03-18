@@ -1,0 +1,31 @@
+name: 'Test node-setup Action'
+
+on:
+  push:
+    paths:
+      - '.github/workflows/test-node-setup.yaml'
+      - '/node-setup/**/*'
+      - '/*'
+
+permissions:
+  actions: 'write'
+
+jobs:
+  setup-node:
+    runs-on: 'ubuntu-latest'
+    steps:
+      - name: 'Setup node 🛎️'
+        uses: './node-setup'
+
+      - name: 'Ensure node_modules exists ✅'
+        run: |-
+          dir="$(pwd)/node_modules"
+          if [ -d "$dir" ]; then
+            echo "✅ $dir exists."
+          else
+            echo "❌ $dir does not exist."
+            dir_up=$(dirname $dir)
+            echo "Contents of $dir_up:"
+            ls -lha "$dir_up"
+            exit 1
+          fi
