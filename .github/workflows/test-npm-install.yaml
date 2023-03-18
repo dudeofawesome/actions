@@ -1,0 +1,117 @@
+name: 'Test Action'
+
+on:
+  push:
+    paths:
+      - '.github/workflows/test-npm-install.yaml'
+      - '/npm-install/**/*'
+      - '/*'
+
+permissions:
+  actions: 'write'
+
+jobs:
+  create-cache:
+    runs-on: 'ubuntu-latest'
+    steps:
+      - name: 'Checkout Repository 🛎️'
+        uses: 'actions/checkout@v3'
+      - name: 'Use Node.js 📗'
+        uses: 'actions/setup-node@v3'
+        with:
+          cache: 'npm'
+          cache-dependency-path: 'package-lock.json'
+      - name: 'Delete pre-existing test cache 🔥'
+        env:
+          GH_TOKEN: '${{ github.token }}'
+        continue-on-error: true
+        run: |-
+          gh extension install actions/gh-actions-cache
+          gh actions-cache delete "test" --confirm
+
+      - name: 'Ensure node_modules does not exist ✅'
+        run: |-
+          dir="$(pwd)/node_modules"
+          if [ ! -f "$dir/.package-lock.json" ]; then
+            echo "✅ $dir does not exist."
+          else
+            echo "❌ $dir already exists."
+            echo "Contents of $dir:"
+            ls -lha "$dir"
+            exit 1
+          fi
+
+      - name: 'Install node modules 📥'
+        id: 'install'
+        uses: './npm-install'
+
+      - name: 'Ensure node_modules exists ✅'
+        run: |-
+          dir="$(pwd)/node_modules"
+          if [ -d "$dir" ]; then
+            echo "✅ $dir exists."
+          else
+            echo "❌ $dir does not exist."
+            dir_up=$(dirname $dir)
+            echo "Contents of $dir_up:"
+            ls -lha "$dir_up"
+            exit 1
+          fi
+    outputs:
+      modules-dir: '${{ steps.install.outputs.modules-dir }}'
+      cache-key: '${{ steps.install.outputs.cache-key }}'
+
+  test-cache:
+    runs-on: 'ubuntu-latest'
+    needs:
+      - 'create-cache'
+    steps:
+      - name: 'Ensure cache-key is well-formed ✅'
+        run: |-
+          cache_key='${{ needs.create-cache.outputs.cache-key }}'
+          regex="^node_modules-(?'os'\w+)-(?'arch'\w+)-(?'node'node_v[\d.]+)-(?'npm'npm_v[\d.]+)-(?'hash'\w+)$"
+          if [ "$(echo "$cache_key" | grep --perl-regexp "$regex")" ]; then
+            echo "✅ cache-key is well-formed."
+          else
+            echo "❌ cache-key is malformed."
+            echo "'$cache_key' does not match '$regex'"
+            exit 1
+          fi
+
+      - name: 'Restore test cache 🧩'
+        uses: 'actions/cache/restore@v3'
+        id: 'restore-cache'
+        with:
+          key: '${{ needs.create-cache.outputs.cache-key }}'
+          path: '${{ needs.create-cache.outputs.modules-dir }}'
+          fail-on-cache-miss: 'true'
+
+      - name: 'Ensure cache includes node_modules ✅'
+        run: |-
+          dir="${{ needs.create-cache.outputs.modules-dir }}"
+          pkg_lock="$dir/.package-lock.json"
+          if [ -f "$pkg_lock" ]; then
+            echo "✅ $pkg_lock exists."
+          else
+            echo "❌ $pkg_lock does not exist."
+            echo "Contents of $dir:"
+            ls -lha "$dir"
+            exit 1
+          fi
+
+  cleanup:
+    runs-on: 'ubuntu-latest'
+    needs:
+      - 'create-cache'
+      - 'test-cache'
+    if: 'always()'
+    steps:
+      - name: 'Delete test cache 🔥'
+        env:
+          GH_TOKEN: '${{ github.token }}'
+        continue-on-error: true
+        run: |-
+          gh extension install actions/gh-actions-cache
+          gh actions-cache delete "${{ needs.create-cache.outputs.cache-key }}" \
+            --repo ${{ github.repository }} \
+            --confirm

@@ -1,0 +1,25 @@
+{
+  "name": "actions",
+  "version": "0.0.1",
+  "private": true,
+  "description": "My Github Actions.",
+  "scripts": {
+    "format": "prettier --write"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/dudeofawesome/actions.git"
+  },
+  "keywords": [
+    "github-actions"
+  ],
+  "author": "Louis Orleans <louis@orleans.io>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/dudeofawesome/actions/issues"
+  },
+  "homepage": "https://github.com/dudeofawesome/actions#readme",
+  "devDependencies": {
+    "@dudeofawesome/code-style": "^0.1.1"
+  }
+}

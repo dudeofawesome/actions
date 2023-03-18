@@ -1,0 +1,48 @@
+name: 'dudeofawesome/build-artifact/retrieve'
+description: >-
+  Retrieves a tarred file or directory from a short-lived artifact.
+branding:
+  icon: 'archive'
+  color: 'orange'
+
+inputs:
+  path:
+    description: 'Path to unarchive of file or files in to'
+    required: true
+    default: './'
+  archive-name:
+    description: 'The name of the archive'
+    required: true
+    default: ''
+outputs:
+  path:
+    description: 'Path to the unarchived files'
+    value: '${{ inputs.path }}'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: 'Set archive name 📇'
+      id: 'name'
+      run: |-
+        if [ -n "${{ inputs.archive-name }}" ]; then
+          echo "archive_name=${{ inputs.archive-name }}" >> "$GITHUB_OUTPUT"
+        else
+          echo "archive_name=build-${{ github.sha }}" >> "$GITHUB_OUTPUT"
+        fi
+      shell: 'bash'
+
+    - name: 'Retrieve build 🧩'
+      id: 'download-artifact'
+      uses: 'actions/download-artifact@v3'
+      with:
+        name: '${{ steps.name.outputs.archive_name }}'
+        path: '/tmp/${{ steps.name.outputs.archive_name }}'
+    - name: 'Un-ziptar files 🤐'
+      run: |-
+        ls -lha "${{ steps.download-artifact.outputs.download-path }}";
+        mkdir -p "${{ inputs.path }}";
+        tar --extract \
+          --file "${{ steps.download-artifact.outputs.download-path }}/${{ steps.name.outputs.archive_name }}.tar" \
+          --directory "${{ inputs.path }}";
+      shell: 'bash'

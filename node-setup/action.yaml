@@ -1,0 +1,31 @@
+name: 'dudeofawesome/node-setup'
+description: >-
+  Setup node, repo, and dependencies, with caching.
+branding:
+  icon: 'briefcase'
+  color: 'red'
+
+inputs:
+  node-version-file:
+    description: 'Path to a file containing the version Spec of the version to use.'
+    default: '.nvmrc'
+  registry-url:
+    description: 'Registry to set up auth with, using $NODE_AUTH_TOKEN. Will be set up in a project-level npmrc.'
+    default: 'https://registry.npmjs.org'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: 'Checkout Repository 🛎️'
+      uses: 'actions/checkout@v3'
+
+    - name: 'Use Node.js 📗'
+      uses: 'actions/setup-node@v3'
+      with:
+        node-version-file: '.nvmrc'
+        cache: 'npm'
+        cache-dependency-path: 'package-lock.json'
+        registry-url: 'https://registry.npmjs.org'
+
+    - name: 'Install node modules 📥'
+      uses: 'dudeofawesome/actions/npm-install@v1'

@@ -1,0 +1,48 @@
+name: 'dudeofawesome/build-artifact/cache'
+description: >-
+  Caches a tarred file or directory into a short-lived artifact for use with
+  later jobs.
+branding:
+  icon: 'archive'
+  color: 'blue'
+
+inputs:
+  path:
+    description: 'Path of file or files to archive.'
+    required: true
+    default: './'
+  archive-name:
+    description: 'The name of the archive.'
+    required: true
+    default: ''
+
+outputs:
+  archive-name:
+    description: 'The name of the archive.'
+    value: '${{ steps.name.outputs.archive_name }}'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: 'Set archive name 📇'
+      id: 'name'
+      run: |-
+        if [ -n "${{ inputs.archive-name }}" ]; then
+          echo "archive_name=${{ inputs.archive-name }}" >> "$GITHUB_OUTPUT"
+        else
+          echo "archive_name=build-${{ github.sha }}" >> "$GITHUB_OUTPUT"
+        fi
+      shell: 'bash'
+
+    - name: 'Tar files 🤐'
+      run: >-
+        tar --create \
+          --file "/tmp/${{ steps.name.outputs.archive_name }}.tar" \
+          "${{ inputs.path }}";
+      shell: 'bash'
+    - name: 'Cache build 🧩'
+      uses: 'actions/upload-artifact@v3'
+      with:
+        name: '${{ steps.name.outputs.archive_name }}'
+        path: '/tmp/${{ steps.name.outputs.archive_name }}.tar'
+        retention-days: 1
