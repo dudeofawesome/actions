@@ -1,4 +1,4 @@
-name: 'Test Action'
+name: 'Test npm-install Action'
 
 on:
   push:
