@@ -22,10 +22,10 @@ runs:
     - name: 'Use Node.js 📗'
       uses: 'actions/setup-node@v3'
       with:
-        node-version-file: '.nvmrc'
+        node-version-file: '${{ inputs.node-version-file }}'
         cache: 'npm'
         cache-dependency-path: 'package-lock.json'
-        registry-url: 'https://registry.npmjs.org'
+        registry-url: '${{ inputs.registry-url }}'
 
     - name: 'Install node modules 📥'
       uses: 'dudeofawesome/actions/npm-install@v1'
