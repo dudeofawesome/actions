@@ -1,4 +1,4 @@
-# `dudeofawesome/actions/node-setup`
+# `dudeofawesome/actions/node-setup` [![release](https://github.com/dudeofawesome/actions/actions/workflows/test-node-setup.yaml/badge.svg)](https://github.com/dudeofawesome/actions/actions/workflows/test-node-setup.yaml)
 
 Setup node, repo, and dependencies, with caching.
 

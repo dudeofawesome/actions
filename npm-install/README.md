@@ -1,4 +1,4 @@
-# `dudeofawesome/actions/npm-install`
+# `dudeofawesome/actions/npm-install` [![release](https://github.com/dudeofawesome/actions/actions/workflows/test-npm-install.yaml/badge.svg)](https://github.com/dudeofawesome/actions/actions/workflows/test-npm-install.yaml)
 
 A Github Actions composite action to install and cache node modules.
 
