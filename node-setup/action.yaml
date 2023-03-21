@@ -7,11 +7,17 @@ branding:
 
 inputs:
   node-version-file:
-    description: 'Path to a file containing the version Spec of the version to use.'
+    description: >-
+      Path to a file containing the version Spec of the version to use.
     default: '.nvmrc'
   registry-url:
-    description: 'Registry to set up auth with, using $NODE_AUTH_TOKEN. Will be set up in a project-level npmrc.'
+    description: >-
+      Registry to set up auth with, using $NODE_AUTH_TOKEN.
+      Will be set up in a project-level npmrc.
     default: 'https://registry.npmjs.org'
+  install-modules:
+    description: 'Wether or not to install node modules.'
+    default: 'true'
 
 runs:
   using: 'composite'
@@ -28,4 +34,5 @@ runs:
         registry-url: '${{ inputs.registry-url }}'
 
     - name: 'Install node modules 📥'
+      if: '${{ inputs.install-modules }}'
       uses: 'dudeofawesome/actions/npm-install@v1'
