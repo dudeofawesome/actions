@@ -3,9 +3,9 @@ name: 'Test npm-install Action'
 on:
   push:
     paths:
-      - './.github/workflows/test-npm-install.yaml'
-      - './npm-install/**'
-      - './*'
+      - '.github/workflows/test-npm-install.yaml'
+      - 'npm-install/**'
+      - '*'
 
 permissions:
   actions: 'write'
