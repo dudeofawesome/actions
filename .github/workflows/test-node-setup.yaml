@@ -3,9 +3,9 @@ name: 'Test node-setup Action'
 on:
   push:
     paths:
-      - '.github/workflows/test-node-setup.yaml'
-      - '/node-setup/**'
-      - '/*'
+      - './.github/workflows/test-node-setup.yaml'
+      - './node-setup/**'
+      - './*'
 
 permissions:
   actions: 'write'
