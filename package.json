@@ -3,23 +3,46 @@
   "version": "1.0.1",
   "private": true,
   "description": "My Github Actions.",
-  "scripts": {
-    "format": "prettier --write"
+  "keywords": [
+    "github-actions"
+  ],
+  "homepage": "https://github.com/dudeofawesome/actions#readme",
+  "bugs": {
+    "url": "https://github.com/dudeofawesome/actions/issues"
   },
   "repository": {
     "type": "git",
     "url": "git+ssh://git@github.com/dudeofawesome/actions.git"
   },
-  "keywords": [
-    "github-actions"
-  ],
-  "author": "Louis Orleans <louis@orleans.io>",
   "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/dudeofawesome/actions/issues"
+  "author": "Louis Orleans <louis@orleans.io>",
+  "workspaces": [
+    "npm-publish"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces --if-present",
+    "format": "prettier --write",
+    "lint": "eslint . && tsc --noEmit",
+    "test": "npm run test --workspaces && jest"
   },
-  "homepage": "https://github.com/dudeofawesome/actions#readme",
   "devDependencies": {
-    "@dudeofawesome/code-style": "^0.1.1"
+    "@dudeofawesome/code-style": "^2.0.0-2",
+    "@dudeofawesome/eslint-config": "^2.0.0-2",
+    "@dudeofawesome/eslint-config-cli": "^2.0.0-2",
+    "@dudeofawesome/eslint-config-jest": "^2.0.0-2",
+    "@dudeofawesome/eslint-config-typescript": "^2.0.0-2",
+    "@dudeofawesome/typescript-configs": "^2.0.0-2",
+    "@types/jest": "^29.5.5",
+    "@types/node": "^20.8.4",
+    "esbuild": "^0.19.4",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.1",
+    "type-fest": "^4.4.0",
+    "typescript": "^5.2.2"
+  },
+  "overrides": {
+    "eslint-plugin-import": {
+      "tsconfig-paths": "^4.2.0"
+    }
   }
 }
