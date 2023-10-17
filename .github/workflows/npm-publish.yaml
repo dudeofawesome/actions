@@ -18,12 +18,14 @@ jobs:
         uses: 'dudeofawesome/actions/node-setup@v1'
       - name: 'Build 🏗'
         run: 'npm run build --workspace=npm-publish'
-      - name: 'Commit build 💨'
+      - name: 'Set up git user 🔑'
         run: |
           git config --global user.name 'Louis Orleans'
           git config --global user.email 'louis@orleans.io'
-          git add npm-publish/dist/
+      - name: 'Commit build 💨'
+        run: |
           if [ -n "$(git status --porcelain npm-publish/dist/)" ]; then
+            git add npm-publish/dist/
             git commit --message '📦️ build npm-publish action'
             git push
           fi
