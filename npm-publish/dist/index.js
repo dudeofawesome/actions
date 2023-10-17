@@ -22881,9 +22881,6 @@ function log_tap(log = console.info, title = void 0, transformer = (v) => {
   };
 }
 
-// src/config.ts
-var GITHUB_TOKEN = process.env.GITHUB_TOKEN;
-
 // src/index.ts
 async function get_workspace_paths(package_dir_path, included_workspaces, excluded_workspaces) {
   function filterExcluded(ws) {
@@ -22903,12 +22900,15 @@ async function get_workspace_paths(package_dir_path, included_workspaces, exclud
   }
 }
 function read_node_package(path, workspace = void 0) {
-  return (0, import_promises.readFile)(path).then((buffer) => buffer.toString()).then((string) => JSON.parse(string)).then((object) => CheckNodePackage(object)).then((pkg) => ({
-    ...pkg,
-    ...workspace != null ? { workspace_path: (0, import_node_path.dirname)(path), parent_package: workspace } : {}
-  }));
+  return (0, import_promises.readFile)(path).then((buffer) => buffer.toString()).then((string) => JSON.parse(string)).then((object) => CheckNodePackage(object)).then(
+    (pkg) => ({
+      ...pkg,
+      ...workspace != null ? { workspace_path: (0, import_node_path.dirname)(path), parent_package: workspace } : {}
+    })
+  );
 }
 function get_inputs() {
+  const github_token = (0, import_core.getInput)("github-token");
   const package_dir_path = (0, import_node_path.resolve)((0, import_core.getInput)("package-dir-path"));
   const included_workspaces = ParseStringToArray(
     (0, import_core.getInput)("included-workspaces")
@@ -22916,6 +22916,9 @@ function get_inputs() {
   const excluded_workspaces = ParseStringToArray(
     (0, import_core.getInput)("excluded-workspaces")
   ).map((p) => (0, import_node_path.resolve)(p));
+  if (github_token == null || github_token === "") {
+    throw new TypeError(`github-token must be set.`);
+  }
   if (package_dir_path.endsWith("package.json")) {
     throw new TypeError(
       `\`package_dir_path\` should be a path to a directory (ie, should not end with "package.json")`
@@ -22929,6 +22932,7 @@ function get_inputs() {
     }
   }
   return {
+    github_token,
     package_dir_path,
     included_workspaces,
     excluded_workspaces
@@ -22945,8 +22949,13 @@ async function is_default_branch(octokit) {
 }
 async function main() {
   (0, import_core.info)(`cwd: ${process.cwd()}`);
-  const { package_dir_path, included_workspaces, excluded_workspaces } = get_inputs();
-  const octokit = (0, import_github.getOctokit)(GITHUB_TOKEN);
+  const {
+    github_token,
+    package_dir_path,
+    included_workspaces,
+    excluded_workspaces
+  } = get_inputs();
+  const octokit = (0, import_github.getOctokit)(github_token);
   process.chdir(package_dir_path);
   (0, import_core.info)(`cwd: ${process.cwd()}`);
   const packages = await get_workspace_paths(
