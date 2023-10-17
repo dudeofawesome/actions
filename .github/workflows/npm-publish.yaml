@@ -23,8 +23,10 @@ jobs:
           git config --global user.name 'Louis Orleans'
           git config --global user.email 'louis@orleans.io'
           git add npm-publish/dist/
-          git commit --message '📦️ build npm-publish action'
-          git push
+          if [ -n "$(git status --porcelain npm-publish/dist/)" ]; then
+            git commit --message '📦️ build npm-publish action'
+            git push
+          fi
 
   test:
     runs-on: 'ubuntu-latest'
