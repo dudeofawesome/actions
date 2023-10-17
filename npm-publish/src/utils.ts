@@ -5,8 +5,8 @@ import { context } from '@actions/github';
 import type { GitHub } from '@actions/github/lib/utils';
 import type { PackageJson } from 'type-fest';
 
-import { ParseStringToArray } from '../../utils/parse-string-to-array';
-import { CheckNodePackage } from '../../utils/check-node-package';
+import { ParseStringToArray } from 'utils/parse-string-to-array';
+import { CheckNodePackage } from 'utils/check-node-package';
 
 export async function get_workspace_paths(
   package_dir_path: string,

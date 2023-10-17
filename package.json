@@ -17,7 +17,8 @@
   "license": "MIT",
   "author": "Louis Orleans <louis@orleans.io>",
   "workspaces": [
-    "npm-publish"
+    "npm-publish",
+    "utils"
   ],
   "scripts": {
     "build": "npm run build --workspaces --if-present",

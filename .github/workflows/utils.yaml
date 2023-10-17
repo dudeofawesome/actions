@@ -16,4 +16,4 @@ jobs:
 
       - name: 'Test utils 🧪'
         run: |
-          jest utils/
+          npm run test --workspace utils

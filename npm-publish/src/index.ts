@@ -3,8 +3,8 @@ import { debug, setOutput } from '@actions/core';
 import { getOctokit } from '@actions/github';
 import { exec } from '@actions/exec';
 
-import { filter } from '../../utils/async-filter';
-import { log_tap } from '../../utils/log-tap';
+import { filter } from 'utils/async-filter';
+import { log_tap } from 'utils/log-tap';
 import {
   get_inputs,
   get_workspace_paths,
