@@ -1,0 +1,76 @@
+name: 'Test & Build npm-publish Action'
+
+on:
+  push:
+    paths:
+      - '.github/workflows/npm-publish.yaml'
+      - 'npm-publish/**'
+      - 'utils/**'
+      - '*'
+
+jobs:
+  build:
+    runs-on: 'ubuntu-latest'
+    permissions:
+      contents: 'write'
+    steps:
+      - name: 'Setup 🛎️'
+        uses: 'dudeofawesome/actions/node-setup@v1'
+      - name: 'Build 🏗'
+        run: 'npm run build --workspace=npm-publish'
+      - name: 'Commit build 💨'
+        run: |
+          git config --global user.name 'Louis Orleans'
+          git config --global user.email 'louis@orleans.io'
+          git add npm-publish/dist/
+          git commit --message '📦️ build npm-publish action'
+          git push
+
+  test:
+    runs-on: 'ubuntu-latest'
+
+    needs:
+      - 'build'
+
+    services:
+      npm_registry:
+        image: 'docker.io/verdaccio/verdaccio:5'
+        ports:
+          - '4873:4873'
+
+    strategy:
+      matrix:
+        tests:
+          # - name: 'single-package'
+          #   path: 'npm-publish/test/fixtures/single-package'
+          - name: 'workspace'
+            path: 'npm-publish/test/fixtures/workspace'
+    defaults:
+      run:
+        working-directory: '${{ matrix.tests.path }}'
+    name: 'publish-package/${{ matrix.tests.name }}'
+    steps:
+      - name: 'Checkout Repository 🛎️'
+        uses: 'actions/checkout@v3'
+      - name: 'Use Node.js 📗'
+        uses: 'actions/setup-node@v3'
+        with:
+          cache: 'npm'
+          cache-dependency-path: '${{ matrix.tests.path }}/package-lock.json'
+
+      - name: 'Login to test NPM registry 🔑'
+        # we use 127.0.0.1 instead of localhost here because localhost resolves
+        #   to IPv6, and our verdaccio doesn't support IPv6.
+        run: |
+          username="$(($(date +%s%N)/1000000))"
+          npx npm-cli-adduser \
+            --username "$username" \
+            --password "pass" \
+            --email "$username@example.com" \
+            --registry "http://127.0.0.1:4873"
+
+      - name: 'Publish to NPM 📥'
+        id: 'publish'
+        uses: './npm-publish'
+        with:
+          package-dir-path: '${{ matrix.tests.path }}'

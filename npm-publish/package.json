@@ -1,0 +1,30 @@
+{
+  "name": "npm-publish",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Publish your package to NPM",
+  "keywords": [
+    "github-actions"
+  ],
+  "homepage": "https://github.com/dudeofawesome/actions#readme",
+  "bugs": {
+    "url": "https://github.com/dudeofawesome/actions/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/dudeofawesome/actions.git",
+    "directory": "npm-publish"
+  },
+  "license": "MIT",
+  "author": "Louis Orleans <louis@orleans.io>",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "node scripts/esbuild.mjs",
+    "test": "echo \"Error: no test specified\" && exit 0"
+  },
+  "dependencies": {
+    "@actions/core": "^1.10.1",
+    "@actions/exec": "^1.1.1",
+    "@actions/github": "^6.0.0"
+  }
+}

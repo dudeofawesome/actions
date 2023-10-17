@@ -1,0 +1,19 @@
+name: 'Test utils'
+
+on:
+  push:
+    paths:
+      - '.github/workflows/utils.yaml'
+      - 'utils/**'
+      - '*'
+
+jobs:
+  test:
+    runs-on: 'ubuntu-latest'
+    steps:
+      - name: 'Setup 🛎️'
+        uses: 'dudeofawesome/actions/node-setup@v1'
+
+      - name: 'Test utils 🧪'
+        run: |
+          jest utils/

@@ -1,0 +1,8 @@
+{
+  "name": "monorepo",
+  "workspaces": [
+    "package-1",
+    "package-2",
+    "package-3"
+  ]
+}

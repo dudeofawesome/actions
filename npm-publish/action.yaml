@@ -1,0 +1,26 @@
+name: 'dudeofawesome/npm-publish'
+description: >-
+  An action to publish your package(s) to NPM.
+branding:
+  icon: 'box'
+  color: 'red'
+
+inputs:
+  package-dir-path:
+    description: 'Path of dir with (main) package.json.'
+    required: true
+    default: '.'
+  included-workspaces:
+    description: 'A list of newline-separated workspace paths to include.'
+  excluded-workspaces:
+    description: 'A list of newline-separated workspace paths to exclude.'
+    required: true
+    default: ''
+
+outputs:
+  published-package-names:
+    description: 'A newline-delimited list of published packages.'
+
+runs:
+  using: 'node20'
+  main: 'dist/index.js'
