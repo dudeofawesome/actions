@@ -89,3 +89,19 @@ jobs:
         uses: './npm-publish'
         with:
           package-dir-path: '${{ matrix.tests.path }}'
+
+      - name: 'Check outputs ✅'
+        run: |
+          # install shunit2
+          shunit='/tmp/shunit2'
+          wget 'https://raw.githubusercontent.com/kward/shunit2/v2.1.8/shunit2' \
+            --output-file="$shunit" \
+            --quiet
+
+          # define tests
+          testOutput() {
+            assertEquals "${{ steps.publish.outputs.published-package-names }}" "package-1\npackage-2\npackage-3"
+          }
+
+          # run tests
+          . "$shunit"
