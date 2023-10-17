@@ -723,7 +723,7 @@ var require_tunnel = __commonJS({
         connectOptions.headers = connectOptions.headers || {};
         connectOptions.headers["Proxy-Authorization"] = "Basic " + new Buffer(connectOptions.proxyAuth).toString("base64");
       }
-      debug("making CONNECT request");
+      debug2("making CONNECT request");
       var connectReq = self.request(connectOptions);
       connectReq.useChunkedEncodingByDefault = false;
       connectReq.once("response", onResponse);
@@ -743,7 +743,7 @@ var require_tunnel = __commonJS({
         connectReq.removeAllListeners();
         socket.removeAllListeners();
         if (res.statusCode !== 200) {
-          debug(
+          debug2(
             "tunneling socket could not be established, statusCode=%d",
             res.statusCode
           );
@@ -755,7 +755,7 @@ var require_tunnel = __commonJS({
           return;
         }
         if (head.length > 0) {
-          debug("got illegal response body from proxy");
+          debug2("got illegal response body from proxy");
           socket.destroy();
           var error = new Error("got illegal response body from proxy");
           error.code = "ECONNRESET";
@@ -763,13 +763,13 @@ var require_tunnel = __commonJS({
           self.removeSocket(placeholder);
           return;
         }
-        debug("tunneling connection has established");
+        debug2("tunneling connection has established");
         self.sockets[self.sockets.indexOf(placeholder)] = socket;
         return cb(socket);
       }
       function onError(cause) {
         connectReq.removeAllListeners();
-        debug(
+        debug2(
           "tunneling socket could not be established, cause=%s\n",
           cause.message,
           cause.stack
@@ -831,9 +831,9 @@ var require_tunnel = __commonJS({
       }
       return target;
     }
-    var debug;
+    var debug2;
     if (process.env.NODE_DEBUG && /\btunnel\b/.test(process.env.NODE_DEBUG)) {
-      debug = function() {
+      debug2 = function() {
         var args = Array.prototype.slice.call(arguments);
         if (typeof args[0] === "string") {
           args[0] = "TUNNEL: " + args[0];
@@ -843,10 +843,10 @@ var require_tunnel = __commonJS({
         console.error.apply(console, args);
       };
     } else {
-      debug = function() {
+      debug2 = function() {
       };
     }
-    exports.debug = debug;
+    exports.debug = debug2;
   }
 });
 
@@ -17782,10 +17782,10 @@ Support boolean input list: \`true | True | TRUE | false | False | FALSE\``);
       return process.env["RUNNER_DEBUG"] === "1";
     }
     exports.isDebug = isDebug;
-    function debug(message) {
+    function debug2(message) {
       command_1.issueCommand("debug", {}, message);
     }
-    exports.debug = debug;
+    exports.debug = debug2;
     function error(message, properties = {}) {
       command_1.issueCommand("error", utils_1.toCommandProperties(properties), message instanceof Error ? message.toString() : message);
     }
@@ -22826,31 +22826,10 @@ var require_exec = __commonJS({
 });
 
 // src/index.ts
-var import_node_path = require("node:path");
-var import_promises = require("node:fs/promises");
-var import_core = __toESM(require_core());
-var import_github = __toESM(require_github());
+var import_node_path2 = require("node:path");
+var import_core2 = __toESM(require_core());
+var import_github2 = __toESM(require_github());
 var import_exec = __toESM(require_exec());
-
-// ../utils/parse-string-to-array.ts
-function ParseStringToArray(input, { delimiter = "\n", trim = true } = {}) {
-  if (input == null || (trim ? input.trim() : input).length === 0)
-    return [];
-  else
-    return input.split(delimiter).map((v) => trim ? v.trim() : v);
-}
-
-// ../utils/check-node-package.ts
-function CheckNodePackage(possible_package, required_keys = ["name"]) {
-  for (const key of required_keys) {
-    if (typeof possible_package !== "object" || possible_package == null || !(key in possible_package)) {
-      throw new TypeError(
-        `object is missing required key ${key}, and thus is not a package.json.`
-      );
-    }
-  }
-  return possible_package;
-}
 
 // ../utils/async-filter.ts
 async function filter(array, predicate) {
@@ -22881,7 +22860,33 @@ function log_tap(log = console.info, title = void 0, transformer = (v) => {
   };
 }
 
-// src/index.ts
+// src/utils.ts
+var import_node_path = require("node:path");
+var import_promises = require("node:fs/promises");
+var import_core = __toESM(require_core());
+var import_github = __toESM(require_github());
+
+// ../utils/parse-string-to-array.ts
+function ParseStringToArray(input, { delimiter = "\n", trim = true } = {}) {
+  if (input == null || (trim ? input.trim() : input).length === 0)
+    return [];
+  else
+    return input.split(delimiter).map((v) => trim ? v.trim() : v);
+}
+
+// ../utils/check-node-package.ts
+function CheckNodePackage(possible_package, required_keys = ["name"]) {
+  for (const key of required_keys) {
+    if (typeof possible_package !== "object" || possible_package == null || !(key in possible_package)) {
+      throw new TypeError(
+        `object is missing required key ${key}, and thus is not a package.json.`
+      );
+    }
+  }
+  return possible_package;
+}
+
+// src/utils.ts
 async function get_workspace_paths(package_dir_path, included_workspaces, excluded_workspaces) {
   function filterExcluded(ws) {
     return !(excluded_workspaces ?? []).includes(ws);
@@ -22947,17 +22952,17 @@ async function is_default_branch(octokit) {
   } = await octokit.rest.repos.get({ ...import_github.context.repo });
   return import_github.context.ref === default_branch;
 }
+
+// src/index.ts
 async function main() {
-  (0, import_core.info)(`cwd: ${process.cwd()}`);
   const {
     github_token,
     package_dir_path,
     included_workspaces,
     excluded_workspaces
   } = get_inputs();
-  const octokit = (0, import_github.getOctokit)(github_token);
+  const octokit = (0, import_github2.getOctokit)(github_token);
   process.chdir(package_dir_path);
-  (0, import_core.info)(`cwd: ${process.cwd()}`);
   const packages = await get_workspace_paths(
     package_dir_path,
     included_workspaces,
@@ -22966,12 +22971,12 @@ async function main() {
     (workspaces) => Promise.all(
       workspaces.map(
         (workspace) => read_node_package(
-          (0, import_node_path.join)(workspace, "package.json"),
+          (0, import_node_path2.join)(workspace, "package.json"),
           workspace !== package_dir_path ? package_dir_path : void 0
         )
       )
     )
-  ).then(log_tap(import_core.info, "all package.json files")).then((packages2) => filter(packages2, (pkg) => pkg.private !== true)).then(log_tap(import_core.info, "publishable packages")).then(
+  ).then(log_tap(import_core2.debug, "all package.json files")).then((packages2) => filter(packages2, (pkg) => pkg.private !== true)).then(log_tap(import_core2.debug, "publishable packages")).then(
     (packages2) => filter(
       packages2,
       (pkg) => new Promise((resolve2) => {
@@ -22980,12 +22985,12 @@ async function main() {
         }).then(() => resolve2(false)).catch(() => resolve2(true));
       })
     )
-  ).then(log_tap(import_core.info, "unpublished versions")).then(
+  ).then(log_tap(import_core2.debug, "unpublished versions")).then(
     (packages2) => filter(
       packages2,
       async (pkg) => await is_default_branch(octokit) || is_beta(pkg)
     )
-  ).then(log_tap(import_core.info, "default branch / prerelease versions"));
+  ).then(log_tap(import_core2.debug, "default branch / prerelease versions"));
   await Promise.all(
     packages.map(async (pkg) => {
       if (typeof pkg.workspace_path === "string" && typeof pkg.parent_package === "string") {
@@ -22997,7 +23002,7 @@ async function main() {
       return pkg;
     })
   ).then((packages2) => {
-    (0, import_core.setOutput)(
+    (0, import_core2.setOutput)(
       "published-package-names",
       packages2.map((pkg) => pkg.name).join("\n")
     );
