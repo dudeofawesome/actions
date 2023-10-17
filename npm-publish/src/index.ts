@@ -10,7 +10,6 @@ import { ParseStringToArray } from '../../utils/parse-string-to-array';
 import { CheckNodePackage } from '../../utils/check-node-package';
 import { filter } from '../../utils/async-filter';
 import { log_tap } from '../../utils/log-tap';
-import { GITHUB_TOKEN } from './config';
 
 async function get_workspace_paths(
   package_dir_path: string,
@@ -49,19 +48,24 @@ function read_node_package(
     .then((buffer) => buffer.toString())
     .then((string) => JSON.parse(string) as unknown)
     .then((object) => CheckNodePackage(object))
-    .then((pkg) => ({
-      ...pkg,
-      ...(workspace != null
-        ? { workspace_path: dirname(path), parent_package: workspace }
-        : {}),
-    }));
+    .then(
+      (pkg) =>
+        ({
+          ...pkg,
+          ...(workspace != null
+            ? { workspace_path: dirname(path), parent_package: workspace }
+            : {}),
+        }) as PackageJson,
+    );
 }
 
 function get_inputs(): {
+  github_token: string;
   package_dir_path: string;
   included_workspaces: string[];
   excluded_workspaces: string[];
 } {
+  const github_token = getInput('github-token');
   const package_dir_path = resolve(getInput('package-dir-path'));
   const included_workspaces = ParseStringToArray(
     getInput('included-workspaces'),
@@ -69,6 +73,10 @@ function get_inputs(): {
   const excluded_workspaces = ParseStringToArray(
     getInput('excluded-workspaces'),
   ).map((p) => resolve(p));
+
+  if (github_token == null || github_token === '') {
+    throw new TypeError(`github-token must be set.`);
+  }
 
   if (package_dir_path.endsWith('package.json')) {
     throw new TypeError(
@@ -84,6 +92,7 @@ function get_inputs(): {
   }
 
   return {
+    github_token,
     package_dir_path,
     included_workspaces,
     excluded_workspaces,
@@ -107,9 +116,13 @@ async function is_default_branch(
 async function main() {
   info(`cwd: ${process.cwd()}`);
 
-  const { package_dir_path, included_workspaces, excluded_workspaces } =
-    get_inputs();
-  const octokit = getOctokit(GITHUB_TOKEN);
+  const {
+    github_token,
+    package_dir_path,
+    included_workspaces,
+    excluded_workspaces,
+  } = get_inputs();
+  const octokit = getOctokit(github_token);
 
   process.chdir(package_dir_path);
   info(`cwd: ${process.cwd()}`);

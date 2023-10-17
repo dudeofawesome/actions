@@ -6,6 +6,9 @@ branding:
   color: 'red'
 
 inputs:
+  github-token:
+    description: 'Retrived from the github.token context.'
+    required: true
   package-dir-path:
     description: 'Path of dir with (main) package.json.'
     required: true

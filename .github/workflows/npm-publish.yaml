@@ -77,4 +77,5 @@ jobs:
         id: 'publish'
         uses: './npm-publish'
         with:
+          github-token: '${{ github.token }}'
           package-dir-path: '${{ matrix.tests.path }}'
