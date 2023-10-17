@@ -39,6 +39,7 @@ build/Release
 /node_modules/@dudeofawesome/eslint-config/
 /node_modules/@dudeofawesome/code-style/*
 !/node_modules/@dudeofawesome/code-style/.editorconfig
+**/node_modules/
 
 # TypeScript cache
 *.tsbuildinfo
