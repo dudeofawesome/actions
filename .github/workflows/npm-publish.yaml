@@ -84,24 +84,48 @@ jobs:
             --email "$username@example.com" \
             --registry "http://127.0.0.1:4873"
 
-      - name: 'Publish to NPM 📥'
+      - name: 'Publish to NPM 💨'
         id: 'publish'
         uses: './npm-publish'
         with:
           package-dir-path: '${{ matrix.tests.path }}'
 
-      - name: 'Check outputs ✅'
+      - name: 'Install shunit2 📥'
+        id: 'shunit2'
         run: |
           # install shunit2
-          shunit='/tmp/shunit2'
+          shunit2='/tmp/shunit2'
+
           wget 'https://raw.githubusercontent.com/kward/shunit2/v2.1.8/shunit2' \
-            --output-file="$shunit" \
+            --output-file="$shunit2" \
             --quiet
 
+          echo "shunit2=$shunit2" >> "$GITHUB_OUTPUT"
+
+      - name: 'Check package ✅'
+        run: |
+          # define tests
+          testVersionPublished() {
+            package_name="$(
+                printf '${{ steps.publish.outputs.published-package-names }}'
+                | sed '1p;d'
+              )"
+            version='1.0.0-1'
+
+            assertEquals "$(
+                npm view "$package_name@$version" version
+              )" "$version"
+          }
+
+          # run tests
+          . "${{ steps.shunit2.outputs.shunit2 }}"
+
+      - name: 'Check outputs ✅'
+        run: |
           # define tests
           testOutput() {
             assertEquals "${{ steps.publish.outputs.published-package-names }}" "package-1\npackage-2\npackage-3"
           }
 
           # run tests
-          . "$shunit"
+          . "${{ steps.shunit2.outputs.shunit2 }}"
