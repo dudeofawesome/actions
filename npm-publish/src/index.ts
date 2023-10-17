@@ -74,7 +74,7 @@ function get_inputs(): {
     getInput('excluded-workspaces'),
   ).map((p) => resolve(p));
 
-  if (github_token == null || github_token === '') {
+  if (github_token.length === 0) {
     throw new TypeError(`github-token must be set.`);
   }
 
@@ -100,7 +100,7 @@ function get_inputs(): {
 }
 
 function is_beta(pkg: PackageJson): boolean {
-  return pkg.version.match(/^[\d.]+-.+$/u) != null;
+  return pkg.version?.match(/^[\d.]+-.+$/u) != null;
 }
 
 async function is_default_branch(

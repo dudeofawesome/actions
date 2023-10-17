@@ -9,8 +9,18 @@ on:
       - '*'
 
 jobs:
+  lint:
+    runs-on: 'ubuntu-latest'
+    steps:
+      - name: 'Setup 🛎️'
+        uses: 'dudeofawesome/actions/node-setup@v1'
+      - name: 'Build 🏗'
+        run: 'npm run lint --workspace=npm-publish'
+
   build:
     runs-on: 'ubuntu-latest'
+    needs:
+      - 'lint'
     permissions:
       contents: 'write'
     steps:
@@ -34,6 +44,7 @@ jobs:
     runs-on: 'ubuntu-latest'
 
     needs:
+      - 'lint'
       - 'build'
 
     services:

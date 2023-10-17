@@ -11,7 +11,11 @@ export function CheckNodePackage(
   required_keys: (keyof PackageJson)[] = ['name'],
 ): PackageJson {
   for (const key of required_keys) {
-    if (possible_package[key] == null) {
+    if (
+      typeof possible_package !== 'object' ||
+      possible_package == null ||
+      !(key in possible_package)
+    ) {
       throw new TypeError(
         `object is missing required key ${key}, and thus is not a package.json.`,
       );
