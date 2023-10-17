@@ -1,5 +1,5 @@
 import { join } from 'node:path';
-import { debug, info, setOutput } from '@actions/core';
+import { debug, setOutput } from '@actions/core';
 import { getOctokit } from '@actions/github';
 import { exec } from '@actions/exec';
 

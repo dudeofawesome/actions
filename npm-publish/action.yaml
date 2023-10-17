@@ -9,6 +9,7 @@ inputs:
   github-token:
     description: 'Retrived from the github.token context.'
     required: true
+    default: '${{ github.token }}'
   package-dir-path:
     description: 'Path of dir with (main) package.json.'
     required: true
