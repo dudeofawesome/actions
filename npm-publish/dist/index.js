@@ -22843,7 +22843,7 @@ function ParseStringToArray(input, { delimiter = "\n", trim = true } = {}) {
 // ../utils/check-node-package.ts
 function CheckNodePackage(possible_package, required_keys = ["name"]) {
   for (const key of required_keys) {
-    if (possible_package[key] == null) {
+    if (typeof possible_package !== "object" || possible_package == null || !(key in possible_package)) {
       throw new TypeError(
         `object is missing required key ${key}, and thus is not a package.json.`
       );
@@ -22916,7 +22916,7 @@ function get_inputs() {
   const excluded_workspaces = ParseStringToArray(
     (0, import_core.getInput)("excluded-workspaces")
   ).map((p) => (0, import_node_path.resolve)(p));
-  if (github_token == null || github_token === "") {
+  if (github_token.length === 0) {
     throw new TypeError(`github-token must be set.`);
   }
   if (package_dir_path.endsWith("package.json")) {
@@ -22939,7 +22939,7 @@ function get_inputs() {
   };
 }
 function is_beta(pkg) {
-  return pkg.version.match(/^[\d.]+-.+$/u) != null;
+  return pkg.version?.match(/^[\d.]+-.+$/u) != null;
 }
 async function is_default_branch(octokit) {
   const {
