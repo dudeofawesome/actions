@@ -68,29 +68,48 @@ async function main() {
     )
     .then(log_tap(debug, 'default branch / prerelease versions'));
 
-  // publish packages
+  // publish packages, all in one go
   await Promise.all(
-    packages.map(async (pkg) => {
-      if (
-        typeof pkg.workspace_path === 'string' &&
-        typeof pkg.parent_package === 'string'
-      ) {
-        process.chdir(pkg.parent_package);
-        await exec(`npm publish --workspace ${pkg.workspace_path}`);
-      } else {
-        await exec(`npm publish`);
-      }
+    // collect packages into sets of related workspaces
+    packages
+      .reduce<{ cwd: string; workspaces: string }[]>((commands, pkg) => {
+        if (
+          typeof pkg.workspace_path === 'string' &&
+          typeof pkg.parent_package_dir === 'string'
+        ) {
+          const workspace = commands.find(
+            (cmd) => cmd.cwd === pkg.parent_package_dir,
+          );
+          const workspace_flag = `--workspace "${pkg.workspace_path}"`;
 
-      return pkg;
-    }),
-  ).then((packages) => {
-    setOutput(
-      'published-package-names',
-      packages.map((pkg) => pkg.name).join('\n'),
-    );
+          if (workspace != null) {
+            workspace.workspaces += ` ${workspace_flag}`;
+          } else {
+            commands.push({
+              cwd: pkg.parent_package_dir,
+              workspaces: workspace_flag,
+            });
+          }
+        } else {
+          commands.push({ cwd: pkg.workspace_path, workspaces: '' });
+        }
+        return commands;
+      }, [])
+      .map<Promise<unknown>>(({ cwd, workspaces }) => {
+        process.chdir(cwd);
+        return exec(`npm publish ${workspaces}`);
+      }),
+  )
+    .then(() => packages)
+    // set output
+    .then((packages) => {
+      setOutput(
+        'published-package-names',
+        packages.map((pkg) => pkg.name).join('\n'),
+      );
 
-    return packages;
-  });
+      return packages;
+    });
 }
 
 // eslint-disable-next-line @typescript-eslint/no-floating-promises

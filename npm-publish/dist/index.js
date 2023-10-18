@@ -22908,7 +22908,8 @@ function read_node_package(path, workspace = void 0) {
   return (0, import_promises.readFile)(path).then((buffer) => buffer.toString()).then((string) => JSON.parse(string)).then((object) => CheckNodePackage(object)).then(
     (pkg) => ({
       ...pkg,
-      ...workspace != null ? { workspace_path: (0, import_node_path.dirname)(path), parent_package: workspace } : {}
+      workspace_path: (0, import_node_path.dirname)(path),
+      ...workspace != null ? { parent_package_dir: workspace } : {}
     })
   );
 }
@@ -22992,16 +22993,30 @@ async function main() {
     )
   ).then(log_tap(import_core2.debug, "default branch / prerelease versions"));
   await Promise.all(
-    packages.map(async (pkg) => {
-      if (typeof pkg.workspace_path === "string" && typeof pkg.parent_package === "string") {
-        process.chdir(pkg.parent_package);
-        await (0, import_exec.exec)(`npm publish --workspace ${pkg.workspace_path}`);
+    // collect packages into sets of related workspaces
+    packages.reduce((commands, pkg) => {
+      if (typeof pkg.workspace_path === "string" && typeof pkg.parent_package_dir === "string") {
+        const workspace = commands.find(
+          (cmd) => cmd.cwd === pkg.parent_package_dir
+        );
+        const workspace_flag = `--workspace "${pkg.workspace_path}"`;
+        if (workspace != null) {
+          workspace.workspaces += ` ${workspace_flag}`;
+        } else {
+          commands.push({
+            cwd: pkg.parent_package_dir,
+            workspaces: workspace_flag
+          });
+        }
       } else {
-        await (0, import_exec.exec)(`npm publish`);
+        commands.push({ cwd: pkg.workspace_path, workspaces: "" });
       }
-      return pkg;
+      return commands;
+    }, []).map(({ cwd, workspaces }) => {
+      process.chdir(cwd);
+      return (0, import_exec.exec)(`npm publish ${workspaces}`);
     })
-  ).then((packages2) => {
+  ).then(() => packages).then((packages2) => {
     (0, import_core2.setOutput)(
       "published-package-names",
       packages2.map((pkg) => pkg.name).join("\n")

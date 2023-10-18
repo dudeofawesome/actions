@@ -35,12 +35,12 @@ export async function get_workspace_paths(
 
 type PackageJsonWithPaths = PackageJson & {
   workspace_path: string;
-  parent_package: string;
+  parent_package_dir?: string;
 };
 export function read_node_package(
   path: string,
   workspace: string | undefined = undefined,
-): Promise<PackageJson | PackageJsonWithPaths> {
+): Promise<PackageJsonWithPaths> {
   return readFile(path)
     .then((buffer) => buffer.toString())
     .then((string) => JSON.parse(string) as unknown)
@@ -49,10 +49,9 @@ export function read_node_package(
       (pkg) =>
         ({
           ...pkg,
-          ...(workspace != null
-            ? { workspace_path: dirname(path), parent_package: workspace }
-            : {}),
-        }) as PackageJson,
+          workspace_path: dirname(path),
+          ...(workspace != null ? { parent_package_dir: workspace } : {}),
+        }) as PackageJsonWithPaths,
     );
 }
 
