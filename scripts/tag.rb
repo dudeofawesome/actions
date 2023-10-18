@@ -21,4 +21,7 @@ puts `git push --delete origin 'v#{semver[1]}'`
 
 # create new major version tag
 puts tag("v#{semver[1]}")
+
+# push new tags
+puts `git push origin '#{version}'`
 puts `git push origin 'v#{semver[1]}'`
