@@ -66,9 +66,9 @@ jobs:
     name: 'publish-package/${{ matrix.tests.name }}'
     steps:
       - name: 'Checkout Repository 🛎️'
-        uses: 'actions/checkout@v3'
+        uses: 'actions/checkout@v4'
       - name: 'Use Node.js 📗'
-        uses: 'actions/setup-node@v3'
+        uses: 'actions/setup-node@v4'
         with:
           cache: 'npm'
           cache-dependency-path: '${{ matrix.tests.path }}/package-lock.json'

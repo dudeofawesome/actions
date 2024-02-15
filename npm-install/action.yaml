@@ -49,7 +49,7 @@ runs:
         fi
 
     - name: 'Restore node modules 🧩'
-      uses: 'actions/cache/restore@v3'
+      uses: 'actions/cache/restore@v4'
       id: 'restore-cache'
       with:
         key: '${{ steps.vars.outputs.cache-key }}'
@@ -61,7 +61,7 @@ runs:
       run: 'npm install'
 
     - name: 'Cache node modules 🧩'
-      uses: 'actions/cache/save@v3'
+      uses: 'actions/cache/save@v4'
       if: '${{ !steps.restore-cache.cache-hit }}'
       with:
         key: '${{ steps.vars.outputs.cache-key }}'
