@@ -1,5 +1,7 @@
 import { dirname, join, resolve } from 'node:path';
 import { readFile } from 'node:fs/promises';
+import { exec as execCb } from 'node:child_process';
+import { promisify } from 'node:util';
 import { getInput } from '@actions/core';
 import { context } from '@actions/github';
 import type { GitHub } from '@actions/github/lib/utils';
@@ -8,11 +10,17 @@ import type { PackageJson } from 'type-fest';
 import { ParseStringToArray } from 'utils/parse-string-to-array';
 import { CheckNodePackage } from 'utils/check-node-package';
 
+const exec = promisify(execCb);
+
 export async function get_workspace_paths(
   package_dir_path: string,
   included_workspaces: undefined | string[],
-  excluded_workspaces: undefined | string[],
+  _excluded_workspaces: undefined | string[],
 ): Promise<string[]> {
+  const excluded_workspaces = _excluded_workspaces?.map((ws) =>
+    ws.replace(/\/$/u, ''),
+  );
+
   function filterExcluded(ws: string): boolean {
     return !(excluded_workspaces ?? []).includes(ws);
   }
@@ -22,11 +30,13 @@ export async function get_workspace_paths(
     return included_workspaces.filter(filterExcluded);
   } else {
     // read in workspaces from primary package.json
-    const package_json: PackageJson = await read_node_package(
-      join(package_dir_path, 'package.json'),
-    );
-    if (Array.isArray(package_json.workspaces)) {
-      return package_json.workspaces.filter(filterExcluded);
+    const workspaces: string[] = await exec(`npm query .workspace`, {
+      cwd: dirname(package_dir_path),
+    })
+      .then((res) => JSON.parse(res.stdout) as { location: string }[])
+      .then((ws) => ws.map((ws) => ws.location));
+    if (Array.isArray(workspaces) && workspaces.length > 0) {
+      return workspaces.filter(filterExcluded);
     } else {
       return [package_dir_path];
     }
