@@ -1,4 +1,4 @@
-import { dirname, join, resolve } from 'node:path';
+import { dirname, resolve } from 'node:path';
 import { readFile } from 'node:fs/promises';
 import { exec as execCb } from 'node:child_process';
 import { promisify } from 'node:util';
