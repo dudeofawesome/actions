@@ -60,6 +60,8 @@ jobs:
           #   path: 'npm-publish/test/fixtures/single-package'
           - name: 'workspace'
             path: 'npm-publish/test/fixtures/workspace'
+          - name: 'workspace-wildcard'
+            path: 'npm-publish/test/fixtures/workspace-wildcard'
     defaults:
       run:
         working-directory: '${{ matrix.tests.path }}'
