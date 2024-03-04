@@ -22901,7 +22901,7 @@ async function get_workspace_paths(package_dir_path, included_workspaces, _exclu
     return included_workspaces.filter(filterExcluded);
   } else {
     const workspaces = await exec(`npm query .workspace`, {
-      cwd: (0, import_node_path.dirname)(package_dir_path)
+      cwd: package_dir_path
     }).then((res) => JSON.parse(res.stdout)).then((ws) => ws.map((ws2) => ws2.location));
     if (Array.isArray(workspaces) && workspaces.length > 0) {
       return workspaces.filter(filterExcluded);

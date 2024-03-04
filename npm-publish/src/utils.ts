@@ -31,7 +31,7 @@ export async function get_workspace_paths(
   } else {
     // read in workspaces from primary package.json
     const workspaces: string[] = await exec(`npm query .workspace`, {
-      cwd: dirname(package_dir_path),
+      cwd: package_dir_path,
     })
       .then((res) => JSON.parse(res.stdout) as { location: string }[])
       .then((ws) => ws.map((ws) => ws.location));
@@ -65,6 +65,9 @@ export function read_node_package(
     );
 }
 
+/**
+ * @throws {TypeError}
+ */
 export function get_inputs(): {
   github_token: string;
   package_dir_path: string;
