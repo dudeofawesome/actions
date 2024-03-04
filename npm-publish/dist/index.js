@@ -10220,7 +10220,7 @@ var require_mock_interceptor = __commonJS({
 var require_mock_client = __commonJS({
   "../node_modules/undici/lib/mock/mock-client.js"(exports, module2) {
     "use strict";
-    var { promisify } = require("util");
+    var { promisify: promisify2 } = require("util");
     var Client = require_client();
     var { buildMockDispatch } = require_mock_utils();
     var {
@@ -10260,7 +10260,7 @@ var require_mock_client = __commonJS({
         return new MockInterceptor(opts, this[kDispatches]);
       }
       async [kClose]() {
-        await promisify(this[kOriginalClose])();
+        await promisify2(this[kOriginalClose])();
         this[kConnected] = 0;
         this[kMockAgent][Symbols.kClients].delete(this[kOrigin]);
       }
@@ -10273,7 +10273,7 @@ var require_mock_client = __commonJS({
 var require_mock_pool = __commonJS({
   "../node_modules/undici/lib/mock/mock-pool.js"(exports, module2) {
     "use strict";
-    var { promisify } = require("util");
+    var { promisify: promisify2 } = require("util");
     var Pool = require_pool();
     var { buildMockDispatch } = require_mock_utils();
     var {
@@ -10313,7 +10313,7 @@ var require_mock_pool = __commonJS({
         return new MockInterceptor(opts, this[kDispatches]);
       }
       async [kClose]() {
-        await promisify(this[kOriginalClose])();
+        await promisify2(this[kOriginalClose])();
         this[kConnected] = 0;
         this[kMockAgent][Symbols.kClients].delete(this[kOrigin]);
       }
@@ -22776,7 +22776,7 @@ var require_exec = __commonJS({
     exports.getExecOutput = exports.exec = void 0;
     var string_decoder_1 = require("string_decoder");
     var tr = __importStar(require_toolrunner());
-    function exec2(commandLine, args, options) {
+    function exec3(commandLine, args, options) {
       return __awaiter(this, void 0, void 0, function* () {
         const commandArgs = tr.argStringToArray(commandLine);
         if (commandArgs.length === 0) {
@@ -22788,7 +22788,7 @@ var require_exec = __commonJS({
         return runner.exec();
       });
     }
-    exports.exec = exec2;
+    exports.exec = exec3;
     function getExecOutput(commandLine, args, options) {
       var _a, _b;
       return __awaiter(this, void 0, void 0, function* () {
@@ -22811,7 +22811,7 @@ var require_exec = __commonJS({
           }
         };
         const listeners = Object.assign(Object.assign({}, options === null || options === void 0 ? void 0 : options.listeners), { stdout: stdOutListener, stderr: stdErrListener });
-        const exitCode = yield exec2(commandLine, args, Object.assign(Object.assign({}, options), { listeners }));
+        const exitCode = yield exec3(commandLine, args, Object.assign(Object.assign({}, options), { listeners }));
         stdout += stdoutDecoder.end();
         stderr += stderrDecoder.end();
         return {
@@ -22863,6 +22863,8 @@ function log_tap(log = console.info, title = void 0, transformer = (v) => {
 // src/utils.ts
 var import_node_path = require("node:path");
 var import_promises = require("node:fs/promises");
+var import_node_child_process = require("node:child_process");
+var import_node_util2 = require("node:util");
 var import_core = __toESM(require_core());
 var import_github = __toESM(require_github());
 
@@ -22887,18 +22889,22 @@ function CheckNodePackage(possible_package, required_keys = ["name"]) {
 }
 
 // src/utils.ts
-async function get_workspace_paths(package_dir_path, included_workspaces, excluded_workspaces) {
+var exec = (0, import_node_util2.promisify)(import_node_child_process.exec);
+async function get_workspace_paths(package_dir_path, included_workspaces, _excluded_workspaces) {
+  const excluded_workspaces = _excluded_workspaces?.map(
+    (ws) => ws.replace(/\/$/u, "")
+  );
   function filterExcluded(ws) {
     return !(excluded_workspaces ?? []).includes(ws);
   }
   if (Array.isArray(included_workspaces) && included_workspaces.length > 0) {
     return included_workspaces.filter(filterExcluded);
   } else {
-    const package_json = await read_node_package(
-      (0, import_node_path.join)(package_dir_path, "package.json")
-    );
-    if (Array.isArray(package_json.workspaces)) {
-      return package_json.workspaces.filter(filterExcluded);
+    const workspaces = await exec(`npm query .workspace`, {
+      cwd: (0, import_node_path.dirname)(package_dir_path)
+    }).then((res) => JSON.parse(res.stdout)).then((ws) => ws.map((ws2) => ws2.location));
+    if (Array.isArray(workspaces) && workspaces.length > 0) {
+      return workspaces.filter(filterExcluded);
     } else {
       return [package_dir_path];
     }
