@@ -1,0 +1,37 @@
+name: 'Test get-commit-tags Action'
+
+on:
+  push:
+    paths:
+      - '.github/workflows/test-get-commit-tags.yaml'
+      - 'get-commit-tags/**'
+      - '*'
+
+permissions:
+  actions: 'write'
+
+jobs:
+  setup-node:
+    runs-on: 'ubuntu-latest'
+    steps:
+      - name: 'Checkout Repository 🛎️'
+        uses: 'actions/checkout@v4'
+
+      - name: 'Get commit tags 🏷️'
+        id: 'tags'
+        uses: './get-commit-tags'
+        with:
+          commit-sha: 'b3ed9eddf4d442195faf8b01e25eb975759a3259'
+
+      - name: 'Ensure node_modules exists ✅'
+        env:
+          tags: '${{ steps.tags.outputs.tags }}'
+          is_tagged: '${{ steps.tags.outputs.is_tagged }}'
+          has_version_tag: '${{ steps.tags.outputs.has_version_tag }}'
+        shell: 'python'
+        run: |-
+          from os import environ
+
+          assert environ['tags'] == 'v1.0.0', f'Tags list should be v1.0.0, but is {environ["tags"]}'
+          assert environ['is_tagged'] == 'true', "Should indicate commit is tagged"
+          assert environ['has_version_tag'] == 'true', "Should indicate tag is a version"

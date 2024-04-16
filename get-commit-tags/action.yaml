@@ -1,0 +1,43 @@
+name: 'dudeofawesome/actions/get-commit-tags'
+description: >-
+  Gets all tags referencing the specified commit.
+branding:
+  icon: 'tag'
+  color: 'gray-dark'
+
+inputs:
+  commit-sha:
+    description: >-
+      The SHA of the commit you want to check for tags on.
+      Defaults to `github.sha`.
+    default: '${{ github.sha }}'
+outputs:
+  tags:
+    description: 'A list of newline-delimited tags pointing to the specified commit.'
+    value: '${{ steps.set-output.outputs.tags }}'
+  is_tagged:
+    description: 'Whether or not the specified commit has any tags pointing to it.'
+    value: '${{ steps.set-output.outputs.is_tagged }}'
+  has_version_tag:
+    description: 'Whether or not the specified commit has a version tag pointing to it.'
+    value: '${{ steps.set-output.outputs.has_version_tag }}'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: 'Set output'
+      shell: 'bash'
+      id: 'set-output'
+      run: |-
+        tags="$(git describe --exact-match '${{ inputs.commit-sha }}')"
+        is_tagged="$([[ -n "$tags" ]] && echo "true" || echo "false")"
+        has_version_tag="false"
+        for tag in $tags; do
+          if [[ "$tag" =~ ^v[0-9] ]]; then
+            has_version_tag="true"
+          fi
+        done
+
+        echo "tags=$tags" >> "$GITHUB_OUTPUT"
+        echo "is_tagged=$is_tagged" >> "$GITHUB_OUTPUT"
+        echo "has_version_tag=$has_version_tag" >> "$GITHUB_OUTPUT"
