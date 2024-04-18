@@ -40,6 +40,7 @@
     "@code-style/eslint-npm-hoist-packages-esmodule": "^2.0.0-27",
     "@code-style/eslint-npm-hoist-packages-jest": "^2.0.0-27",
     "@code-style/eslint-npm-hoist-packages-typescript": "^2.0.0-27",
+    "@code-style/jest-configs": "^2.0.0-27",
     "@code-style/typescript-configs": "^2.0.0-27",
     "@types/jest": "^29.5.12",
     "@types/node": "^20.12.7",
