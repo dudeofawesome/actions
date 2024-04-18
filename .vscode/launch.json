@@ -1,12 +1,11 @@
+// https://code.visualstudio.com/Docs/editor/debugging#_launch-configurations
 {
   "configurations": [
     {
       "type": "node",
       "request": "attach",
       "name": "Attach",
-      "skipFiles": [
-        "<node_internals>/**"
-      ],
+      "skipFiles": ["<node_internals>/**"],
       "restart": true,
       "continueOnAttach": true
     }

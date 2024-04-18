@@ -1,8 +1,17 @@
+# In order to update the this config, update:
+#   @code-style/eslint-config
+#   @code-style/eslint-config-node
+#   @code-style/eslint-config-cli
+#   @code-style/eslint-config-typescript
+#   @code-style/eslint-config-jest
+#   @code-style/eslint-config-esmodule
 root: true
 extends:
-  - "@dudeofawesome"
-  - "@dudeofawesome/cli"
-  - "@dudeofawesome/typescript"
-  - "@dudeofawesome/jest"
+  - '@code-style/eslint-config'
+  - '@code-style/eslint-config-node'
+  - '@code-style/eslint-config-cli'
+  - '@code-style/eslint-config-typescript'
+  - '@code-style/eslint-config-jest'
+  - '@code-style/eslint-config-esmodule'
 parserOptions:
   ecmaVersion: 2022

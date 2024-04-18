@@ -1,7 +1,13 @@
+// In order to update the this config, update @code-style/typescript-configs
 {
-  "extends": ["@dudeofawesome/typescript-configs/node.json"],
+  "extends": [
+    "@code-style/typescript-configs/roles/node",
+    "@code-style/typescript-configs/layers/esmodule"
+  ],
   "compilerOptions": {
-    "module": "ES2022",
+    "baseUrl": "./",
+    "outDir": "dist/",
+
     "moduleResolution": "Bundler",
     "noEmit": true
   },

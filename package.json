@@ -23,27 +23,37 @@
   "scripts": {
     "build": "npm run build --workspaces --if-present",
     "format": "prettier --write",
-    "lint": "eslint . && tsc --noEmit",
-    "test": "npm run test --workspaces && jest"
+    "lint": "concurrently --group --prefix none \"npm:lint:*\"",
+    "test": "jest",
+    "lint:js": "eslint . --ext ts,json --cache",
+    "lint:types": "tsc --noEmit --pretty true",
+    "check": "concurrently --group --prefix none \"npm:test\" \"npm:lint\""
   },
   "devDependencies": {
-    "@dudeofawesome/code-style": "^2.0.0-2",
-    "@dudeofawesome/eslint-config": "^2.0.0-2",
-    "@dudeofawesome/eslint-config-cli": "^2.0.0-2",
-    "@dudeofawesome/eslint-config-jest": "^2.0.0-2",
-    "@dudeofawesome/eslint-config-typescript": "^2.0.0-2",
-    "@dudeofawesome/typescript-configs": "^2.0.0-2",
-    "@types/jest": "^29.5.5",
-    "@types/node": "^20.8.4",
-    "esbuild": "^0.19.4",
+    "@code-style/code-style": "^2.0.0-27",
+    "@code-style/eslint-config": "^2.0.0-27",
+    "@code-style/eslint-config-cli": "^2.0.0-27",
+    "@code-style/eslint-config-esmodule": "^2.0.0-27",
+    "@code-style/eslint-config-jest": "^2.0.0-27",
+    "@code-style/eslint-config-typescript": "^2.0.0-27",
+    "@code-style/eslint-npm-hoist-packages": "^2.0.0-27",
+    "@code-style/eslint-npm-hoist-packages-esmodule": "^2.0.0-27",
+    "@code-style/eslint-npm-hoist-packages-jest": "^2.0.0-27",
+    "@code-style/eslint-npm-hoist-packages-typescript": "^2.0.0-27",
+    "@code-style/typescript-configs": "^2.0.0-27",
+    "@types/jest": "^29.5.12",
+    "@types/node": "^20.12.7",
+    "concurrently": "^8.2.2",
+    "esbuild": "^0.20.2",
     "jest": "^29.7.0",
-    "ts-jest": "^29.1.1",
+    "ts-jest": "^29.1.2",
     "type-fest": "^4.4.0",
-    "typescript": "^5.2.2"
+    "typescript": "^5.4.5"
   },
   "overrides": {
     "eslint-plugin-import": {
       "tsconfig-paths": "^4.2.0"
     }
-  }
+  },
+  "type": "module"
 }
