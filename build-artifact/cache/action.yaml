@@ -41,7 +41,7 @@ runs:
           "${{ inputs.path }}";
       shell: 'bash'
     - name: 'Cache build 🧩'
-      uses: 'actions/upload-artifact@v3'
+      uses: 'actions/upload-artifact@v4'
       with:
         name: '${{ steps.name.outputs.archive_name }}'
         path: '/tmp/${{ steps.name.outputs.archive_name }}.tar'
